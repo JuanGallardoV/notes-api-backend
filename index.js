@@ -1,7 +1,11 @@
 // ? Juan Gallardo 21-03-2022
+require('dotenv').config()
+require('./mongo')
+
 const express = require('express')
 // ? Necesario para la comunicacion con otros dominios (Buscar CORS[Cross-Origin Resource Sharing] para mas info)
 const cors = require('cors')
+const Note = require('./models/Note')
 const app = express()
 const logger = require('./loggerMiddleware')
 
@@ -10,26 +14,27 @@ app.use(express.json())
 //* const http = require('http');
 app.use(logger)
 
-let notes = [
-  {
-    id: 1,
-    content: 'Nota 1',
-    date: '2019-05-30T17:30:31.098Z',
-    important: true
-  },
-  {
-    id: 2,
-    content: 'Nota 2',
-    date: '2019-05-30T18:30:34.091Z',
-    important: false
-  },
-  {
-    id: 3,
-    content: 'Nota 3',
-    date: '2019-05-30T19:20:14.298Z',
-    important: true
-  }
-]
+let notes = []
+// let notes = [
+//   {
+//     id: 1,
+//     content: 'Nota 1',
+//     date: '2019-05-30T17:30:31.098Z',
+//     important: true
+//   },
+//   {
+//     id: 2,
+//     content: 'Nota 2',
+//     date: '2019-05-30T18:30:34.091Z',
+//     important: false
+//   },
+//   {
+//     id: 3,
+//     content: 'Nota 3',
+//     date: '2019-05-30T19:20:14.298Z',
+//     important: true
+//   }
+// ]
 
 //* const app = http.createServer((request, response) => {
 //*     response.writeHead(200, { 'Content-Type': 'application/json'});
@@ -43,7 +48,10 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/notes', (request, response, next) => {
-  response.json(notes)
+  // response.json(notes)
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 
 app.get('/api/notes/:id', (request, response) => {
@@ -89,7 +97,7 @@ app.post('/api/notes', (request, response) => {
 })
 
 app.use((request, response) => {
-  response.status(4004).json({
+  response.status(404).json({
     error: 'Not found'
   })
 })
